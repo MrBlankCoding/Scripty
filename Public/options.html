@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Options - Script Injector</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+    
+    h1, h2 {
+      margin: 0;
+    }
+    
+    h1 {
+      font-size: 24px;
+    }
+    
+    h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    
+    button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      background-color: #f0f0f0;
+    }
+    
+    button:hover {
+      background-color: #e0e0e0;
+    }
+    
+    button.primary {
+      background-color: #4285f4;
+      color: white;
+    }
+    
+    button.primary:hover {
+      background-color: #2a75f3;
+    }
+    
+    .script-list {
+      margin-bottom: 30px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    
+    th {
+      background-color: #f5f5f5;
+      font-weight: bold;
+    }
+    
+    tbody tr:hover {
+      background-color: #f9f9f9;
+    }
+    
+    .status-enabled {
+      color: #1e8e3e;
+      font-weight: bold;
+    }
+    
+    .status-disabled {
+      color: #999;
+    }
+    
+    .script-actions {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .icon-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 2px 5px;
+      color: #666;
+    }
+    
+    .icon-button:hover {
+      color: #333;
+      background: none;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: #4285f4;
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+    
+    .settings-section {
+      margin-bottom: 30px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      font-weight: normal;
+    }
+    
+    .checkbox-label input {
+      margin-right: 8px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 30px;
+      color: #666;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .tab.active {
+      border-bottom: 2px solid #4285f4;
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .version-info {
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Script Injector Options</h1>
+      <button id="createScriptBtn" class="primary">Create New Script</button>
+    </header>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="scripts">My Scripts</div>
+      <div class="tab" data-tab="settings">Settings</div>
+      <div class="tab" data-tab="about">About</div>
+    </div>
+    
+    <div class="tab-content active" id="scripts-tab">
+      <div class="script-list">
+        <table id="scriptsTable">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Name</th>
+              <th>Target Website</th>
+              <th>Run At</th>
+              <th>Version</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="scriptsList">
+            <!-- Scripts will be populated by JavaScript -->
+          </tbody>
+        </table>
+        
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <p>No scripts yet. Click 'Create New Script' to get started.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="settings-tab">
+      <div class="settings-section">
+        <h2>General Settings</h2>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="enableAllScripts" checked>
+            Enable all scripts by default
+          </label>
+        </div>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="showNotifications" checked>
+            Show notifications when scripts run
+          </label>
+        </div>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="debugMode">
+            Debug mode (show console logs)
+          </label>
+        </div>
+      </div>
+      
+      <div class="settings-section">
+        <h2>Security</h2>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="allowThirdPartyScripts">
+            Allow scripts to load external resources
+          </label>
+        </div>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="confirmBeforeRunning">
+            Confirm before running scripts on new websites
+          </label>
+        </div>
+      </div>
+      
+      <button id="saveSettingsBtn" class="primary">Save Settings</button>
+    </div>
+    
+    <div class="tab-content" id="about-tab">
+      <div class="settings-section">
+        <h2>About Script Injector</h2>
+        <p>Script Injector is a Chrome extension that allows you to inject custom JavaScript code into specific websites based on your preferences.</p>
+        <p>Version: 1.0.0</p>
+        
+        <h2>How to Use</h2>
+        <ul>
+          <li>Create a script by clicking on the "Create New Script" button</li>
+          <li>Specify the target website(s) where the script should run</li>
+          <li>Write your JavaScript code in the editor</li>
+          <li>Choose when the script should run (page start, DOM ready, page load, or when a specific element is loaded)</li>
+          <li>Save your script and it will automatically run when you visit the specified websites</li>
+        </ul>
+        
+        <h2>Features</h2>
+        <ul>
+          <li>Inject custom JavaScript into any website</li>
+          <li>Control when scripts run</li>
+          <li>Enable/disable scripts as needed</li>
+          <li>Manage all your scripts in one place</li>
+        </ul>
+      </div>
+      
+      <div class="version-info">
+        <p>Script Injector v1.0.0</p>
+      </div>
+    </div>
+  </div>
+  
+  <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Script Editor - Script Injector</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+    
+    h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    
+    .editor-container {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    
+    #codeEditor {
+      width: 100%;
+      height: 400px;
+      font-family: monospace;
+      font-size: 14px;
+      padding: 10px;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+    
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    
+    button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      background-color: #f0f0f0;
+    }
+    
+    button:hover {
+      background-color: #e0e0e0;
+    }
+    
+    button.primary {
+      background-color: #4285f4;
+      color: white;
+    }
+    
+    button.primary:hover {
+      background-color: #2a75f3;
+    }
+    
+    .permissions-container {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .permission-item {
+      margin-bottom: 5px;
+    }
+    
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      font-weight: normal;
+    }
+    
+    .checkbox-label input {
+      margin-right: 8px;
+    }
+    
+    .element-selector {
+      margin-top: 10px;
+      display: none;
+    }
+    
+    #waitForSelector {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 id="pageTitle">Create Script</h1>
+      <div class="version-info">
+        <span id="versionLabel">Version:</span>
+        <input type="text" id="scriptVersion" placeholder="1.0.0" size="8">
+      </div>
+    </header>
+    
+    <form id="scriptForm">
+      <div class="form-group">
+        <label for="scriptName">Script Name</label>
+        <input type="text" id="scriptName" placeholder="My Custom Script" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="targetUrl">Target Website(s)</label>
+        <input type="text" id="targetUrl" placeholder="example.com or *.example.com" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="runAt">Run Script</label>
+        <select id="runAt" required>
+          <option value="document_start">As soon as possible (document_start)</option>
+          <option value="document_end">When DOM is ready (document_end)</option>
+          <option value="document_idle" selected>After page load (document_idle)</option>
+          <option value="element_ready">When specific element exists</option>
+        </select>
+        <div class="element-selector" id="selectorContainer">
+          <label for="waitForSelector">Wait for element (CSS selector)</label>
+          <input type="text" id="waitForSelector" placeholder="#main-content or .specific-class">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Permissions</label>
+        <div class="permissions-container">
+          <div class="permission-item">
+            <label class="checkbox-label">
+              <input type="checkbox" id="domAccess" checked>
+              Access to page elements (DOM)
+            </label>
+          </div>
+          <div class="permission-item">
+            <label class="checkbox-label">
+              <input type="checkbox" id="storageAccess">
+              Access to cookies & localStorage
+            </label>
+          </div>
+          <div class="permission-item">
+            <label class="checkbox-label">
+              <input type="checkbox" id="ajaxAccess">
+              Make AJAX/fetch requests
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="codeEditor">Script Code</label>
+        <div class="editor-container">
+          <textarea id="codeEditor" placeholder="// Your JavaScript code here" required></textarea>
+        </div>
+      </div>
+      
+      <div class="actions">
+        <button type="button" id="cancelBtn">Cancel</button>
+        <button type="submit" id="saveBtn" class="primary">Save Script</button>
+      </div>
+    </form>
+  </div>
+  
+  <script src="editor.js"></script>
+</body>
+</html>

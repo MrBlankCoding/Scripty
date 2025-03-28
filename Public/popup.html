@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Script Injector</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      width: 400px;
+      margin: 0;
+      padding: 10px;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+    
+    h1 {
+      font-size: 18px;
+      margin: 0;
+    }
+    
+    .buttons {
+      display: flex;
+      gap: 8px;
+    }
+    
+    button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #f0f0f0;
+    }
+    
+    button.primary {
+      background-color: #4285f4;
+      color: white;
+    }
+    
+    button:hover {
+      background-color: #e0e0e0;
+    }
+    
+    button.primary:hover {
+      background-color: #2a75f3;
+    }
+    
+    .script-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .script-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+    
+    .script-info {
+      flex-grow: 1;
+    }
+    
+    .script-name {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    
+    .script-target {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .script-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: #4285f4;
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+    
+    .icon-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 2px 5px;
+      color: #666;
+    }
+    
+    .icon-button:hover {
+      color: #333;
+      background: none;
+    }
+    
+    footer {
+      margin-top: 10px;
+      font-size: 12px;
+      text-align: center;
+      color: #666;
+    }
+    
+    a {
+      color: #4285f4;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Scripty</h1>
+    <div class="buttons">
+      <button id="openOptions">Options</button>
+      <button id="createScript" class="primary">Create Script</button>
+    </div>
+  </header>
+  
+  <div class="script-list" id="scriptList">
+    <!-- Scripts will be populated by JavaScript -->
+    <div class="empty-state" id="emptyState">
+      <p>No scripts yet. Click 'Create Script' to get started.</p>
+    </div>
+  </div>
+  
+  <footer>
+    <a href="#" id="openFullEditor">Open Full Editor</a>
+  </footer>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
