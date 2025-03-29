@@ -1,0 +1,32 @@
+### **To-Do List**
+
+1. **UI Improvements**
+   - Clean up user interface for a more streamlined experience.
+   - Add dark mode option.
+
+2. **Bug Fixes & Enhancements**
+   - Fix minor bugs throughout the app.
+   - Improve overall functionality and performance.
+
+3. **Editor Features**
+   - Create a lightweight script editor with:
+     - Syntax highlighting for JavaScript.
+     - Error detection.
+     - Code completion.
+
+4. **Custom Script Syntax**
+   - Implement custom syntax for "Scripty" (your app).
+
+5. **API Support & Integration**
+   - Add support for the Greasemonkey API references.
+
+6. **Script Management**
+   - Integrate support for **GreasyFork** for script discovery and installation.
+   - Implement version control for scripts.
+   - Enable script import/export functionality.
+
+7. **Script Search & Filtering**
+   - Implement search functionality for installed scripts.
+
+8. **Performance Optimization**
+   - Implement lazy loading to only execute scripts on active domains.
