@@ -12,31 +12,17 @@ chrome.webNavigation.onCommitted.addListener(async (details) => {
   // Fetch all user scripts from storage
   const { scripts = [] } = await chrome.storage.local.get("scripts");
 
-  // Find scripts that match the current URL
-  const matchingScripts = scripts.filter((script) => {
-    // Skip disabled scripts
-    if (!script.enabled) return false;
-
-    // Check if the URL matches the script's target pattern
-    return urlMatchesPattern(url, script.targetUrl);
-  });
-
-  // If we found matching scripts set to run at document_start
-  const documentStartScripts = matchingScripts.filter(
-    (script) => script.runAt === "document_start"
+  // Find scripts that match the current URL and should run at document_start
+  const documentStartScripts = scripts.filter(
+    (script) =>
+      script.enabled &&
+      script.runAt === "document_start" &&
+      urlMatchesPattern(url, script.targetUrl)
   );
 
-  if (documentStartScripts.length > 0) {
-    // Send message to content script to prepare for injection
-    chrome.tabs
-      .sendMessage(details.tabId, {
-        action: "prepareScriptInjection",
-        scripts: documentStartScripts,
-      })
-      .catch(() => {
-        // Content script might not be ready yet, which is expected at document_start
-        console.log("Content script not ready yet for document_start scripts");
-      });
+  // Execute document_start scripts
+  for (const script of documentStartScripts) {
+    injectScriptDirectly(details.tabId, script.code);
   }
 });
 
@@ -49,22 +35,16 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async (details) => {
   const { scripts = [] } = await chrome.storage.local.get("scripts");
 
   // Find matching scripts that should run at document_end
-  const matchingScripts = scripts.filter(
+  const documentEndScripts = scripts.filter(
     (script) =>
       script.enabled &&
       script.runAt === "document_end" &&
       urlMatchesPattern(url, script.targetUrl)
   );
 
-  if (matchingScripts.length > 0) {
-    chrome.tabs
-      .sendMessage(details.tabId, {
-        action: "injectScripts",
-        scripts: matchingScripts,
-      })
-      .catch((error) => {
-        console.error("Error injecting document_end scripts:", error);
-      });
+  // Execute document_end scripts
+  for (const script of documentEndScripts) {
+    injectScriptDirectly(details.tabId, script.code);
   }
 });
 
@@ -77,24 +57,74 @@ chrome.webNavigation.onCompleted.addListener(async (details) => {
   const { scripts = [] } = await chrome.storage.local.get("scripts");
 
   // Find matching scripts that should run at document_idle
-  const matchingScripts = scripts.filter(
+  const documentIdleScripts = scripts.filter(
     (script) =>
       script.enabled &&
       script.runAt === "document_idle" &&
       urlMatchesPattern(url, script.targetUrl)
   );
 
-  if (matchingScripts.length > 0) {
+  // Execute document_idle scripts
+  for (const script of documentIdleScripts) {
+    injectScriptDirectly(details.tabId, script.code);
+  }
+
+  // Handle element_ready scripts separately
+  const elementReadyScripts = scripts.filter(
+    (script) =>
+      script.enabled &&
+      script.runAt === "element_ready" &&
+      urlMatchesPattern(url, script.targetUrl)
+  );
+
+  // For element_ready scripts, inject a content script that will wait for the element
+  if (elementReadyScripts.length > 0) {
+    // Send a message to the content script to handle element-ready scripts
     chrome.tabs
       .sendMessage(details.tabId, {
-        action: "injectScripts",
-        scripts: matchingScripts,
+        action: "waitForElements",
+        scripts: elementReadyScripts,
       })
       .catch((error) => {
-        console.error("Error injecting document_idle scripts:", error);
+        console.error(
+          "Error sending element-ready scripts to content script:",
+          error
+        );
       });
   }
 });
+
+// Function to inject a script directly using the scripting API with MAIN world
+function injectScriptDirectly(tabId, code) {
+  chrome.scripting
+    .executeScript({
+      target: { tabId: tabId },
+      world: "MAIN", // This is the key part - run in the same JavaScript context as the page
+      func: runCode,
+      args: [code],
+    })
+    .catch((error) => {
+      console.error("Error injecting script:", error);
+    });
+}
+
+// Function that runs in the page context
+function runCode(code) {
+  try {
+    console.log("Executing code:", code); // Log the code for debugging
+
+    // Validate the code by attempting to parse it
+    new Function(code); // Throws a SyntaxError if the code is invalid
+
+    // Use eval in the page context
+    return eval(code);
+  } catch (error) {
+    console.error("Error executing injected script:", error, "Code:", code);
+
+    // Return detailed error information
+    return { error: error.message, code };
+  }
+}
 
 // Function to check if a URL matches a pattern
 function urlMatchesPattern(url, pattern) {
@@ -152,16 +182,7 @@ function urlMatchesPattern(url, pattern) {
 // Handle communication from popup or options page
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "scriptsUpdated") {
-    // Refresh script execution on the active tab if needed
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs.length > 0) {
-        const activeTab = tabs[0];
-        // If needed, trigger a refresh of scripts on the active tab
-        chrome.tabs
-          .sendMessage(activeTab.id, { action: "refreshScripts" })
-          .catch(() => console.log("No content script to refresh"));
-      }
-    });
+    // Scripts will be executed on the next navigation event
     sendResponse({ status: "received" });
   }
   return true; // Keep the message channel open for async responses
